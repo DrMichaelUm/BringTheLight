@@ -4862,7 +4862,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9042743121812694396}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -4967,11 +4967,13 @@ MonoBehaviour:
   mat: {fileID: 0}
   center: {x: 0, y: 0}
   startLine: 0
+  dot1: {x: 0, y: 0}
+  dot2: {x: 0, y: 0}
   endPoint: {x: 0, y: 0}
   targetNode: {fileID: 0}
   answerNode: {fileID: 0}
-  shinyNode: {fileID: 0}
   parentTargetNode: {fileID: 0}
+  parentNodeIndex: 0
   particleTransform: {fileID: 3844798703066592686}
   activateAnswer: 0
 --- !u!68 &8470358810752494618

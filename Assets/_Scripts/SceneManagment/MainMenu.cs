@@ -25,6 +25,16 @@ namespace UI
             app.Level2();
         }
 
+        public void Level3()
+        {
+            app.Level3();
+        }
+
+        public void LoadLevel(string name)
+        {
+            app.LoadLevel(name);
+        }
+
         public void Back()
         {
             app.ToStartup();

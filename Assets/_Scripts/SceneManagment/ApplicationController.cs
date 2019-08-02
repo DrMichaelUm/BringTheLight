@@ -32,6 +32,15 @@ namespace Controller
             loader.Load("level_2", () => Helpers.Log("Level 2 loaded"));
         }
 
+        public void Level3()
+        {
+            loader.Load("level_3", () => Helpers.Log("Level 3 laoded"));
+        }
+
+        public void LoadLevel(string name)
+        {
+            loader.Load(name, () => Helpers.Log(name + " laoded"));
+        }
         public void ToStartup()
         {
             loader.UnloadAll(LoadStartup);

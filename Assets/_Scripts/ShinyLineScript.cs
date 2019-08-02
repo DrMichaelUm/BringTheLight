@@ -9,7 +9,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     EdgeCollider2D edgeCol;
     Vector3 mousePosition;
     List<Vector2> points = new List<Vector2>();
-    Vector2 dot1, dot2;
+    public Vector2 dot1, dot2;
     public Vector2 endPoint;
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
@@ -30,18 +30,18 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     bool destroyLine = false;
     private void Start()
     {
+        gameManager = GameManager.Instance;
         rt = GetComponent<RectTransform>();
         lineRenderer = GetComponent<LineRenderer>();
         edgeCol = GetComponent<EdgeCollider2D>();
         ps = GetComponentInChildren<ParticleSystem>();
         mat = ps.GetComponent<Renderer>().material;
         mat.SetColor("_TintColor", col);
-        gameManager = GameManager.Instance;
     }
 
     private void Update()
     {
-        
+
         if (Input.GetMouseButton(0))
         {
             if (startLine)
@@ -90,7 +90,8 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     if (targetNode != null && !targetNode.initializator)
                     {
                         targetNodeIndex = targetNode.index;
-                        if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1) {
+                        if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
+                        {
                             if (!targetNode.activate)
                             {
                                 targetNode.activate = true;
@@ -131,32 +132,32 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("TargetNode"))
-        {
-            targetNode = collision.GetComponent<TargetNodeScript>();
-            if (parentTargetNode == targetNode)
-            {
-                targetNode = null;
-            }
-            else
-            {
-                activateAnswer = false;
-                answerNode = null;
-            }
-        }
-        if (collision.CompareTag("AnswerNode"))
-        {
-            answerNode = collision.GetComponent<AnswerNodeScript>();
-            activateAnswer = true;
-            targetNode = null;
-        }
-    }
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //if (collision.CompareTag("TargetNode"))
+    //{
+    //    targetNode = collision.GetComponent<TargetNodeScript>();
+    //    if (parentTargetNode == targetNode)
+    //    {
+    //        targetNode = null;
+    //    }
+    //    else
+    //    {
+    //        activateAnswer = false;
+    //        answerNode = null;
+    //    }
+    //}
+    //if (collision.CompareTag("AnswerNode"))
+    //{
+    //    answerNode = collision.GetComponent<AnswerNodeScript>();
+    //    activateAnswer = true;
+    //    targetNode = null;
+    //}
+    //}
 
     private void OnMouseDown()
     {
-        if (activateAnswer || (targetNode!=null && !targetNode.initializator))
+        if (activateAnswer || (targetNode != null && !targetNode.initializator))
         {
             clicked++;
             if (clicked == 1) clicktime = Time.time;
@@ -231,10 +232,10 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         }
         particleTransform.rotation = _lookRotation;
         var psShape = ps.shape;
-        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((dot2.x - dot1.x), 2) + Mathf.Pow((dot2.y - dot1.y), 2))*0.9f, 0f, 0f);
+        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((dot2.x - dot1.x), 2) + Mathf.Pow((dot2.y - dot1.y), 2)) * 0.9f, 0f, 0f);
         #endregion
-            points.Add(dot1);
-            points.Add(dot2);
+        points.Add(dot1);
+        points.Add(dot2);
         edgeCol.points = points.ToArray();
         points.Clear();
     }

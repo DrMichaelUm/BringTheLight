@@ -4923,10 +4923,10 @@ MonoBehaviour:
   inColors: []
   numOfLines: 0
   inTarget: 0
-  targetN: 0
   ps: {fileID: 0}
   linePrefab: {fileID: 9042743121812694396, guid: 1ed1271d4c8d6254f8343a0350120b30,
     type: 3}
+  index: 0
 --- !u!58 &7760118083182222519
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -4960,7 +4960,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8d38616bc49e647499a3311b231a8b0f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4985,7 +4985,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0

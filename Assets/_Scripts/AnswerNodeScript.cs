@@ -7,6 +7,7 @@ public class AnswerNodeScript : Node
     public bool activated = false;
     public bool rightAnswer = false;
     public ParticleSystem rightAnswerEffect;
+    ShinyLineScript line;
     private void Start()
     {
         index = GameManager.Instance.nodeNumeration;
@@ -26,7 +27,7 @@ public class AnswerNodeScript : Node
     public void CheckAnswer()
     {
 
-        if(this.col == originColor)
+        if (this.col == originColor)
         {
             rightAnswer = true;
             GameManager.Instance.numOfRightAnswers++;
@@ -49,13 +50,26 @@ public class AnswerNodeScript : Node
         }
     }
 
-    private void OnMouseEnter()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if(!activated)
-        OnMouseEnterFunction();
+        if (other.CompareTag("ShinyLine"))
+            if (!activated)
+            {
+                OnMouseEnterFunction();
+                line = other.GetComponent<ShinyLineScript>();
+                line.answerNode = GetComponent<AnswerNodeScript>();
+                line.activateAnswer = true;
+                line.targetNode = null;
+            }
     }
     private void OnMouseExit()
     {
+        if (line != null && line.startLine)
+        {
+            line.answerNode = null;
+            line.activateAnswer = false;
+        }
         OnMouseExitFunction();
+
     }
 }

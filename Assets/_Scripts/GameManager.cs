@@ -9,12 +9,13 @@ using Controller;
 
 public class GameManager : Managment
 {
+    public static GameManager Instance;
     //Dictionary<string, LevelConfig> levels;
     public string levelConfigName = "";
     string json;
-    public static GameManager Instance;
+    
     public ApplicationController app;
-    public int currentLevelNum;
+
     public bool inTarget = false;
     public Vector2 endPoint;
     public int requiredAnswers = 3;
@@ -32,7 +33,6 @@ public class GameManager : Managment
     public int nodeNumeration = 50;
     public List<LineData> lines = new List<LineData>();
     Animator rootGlowerAnimator;
-    public TextAsset text;
     private void Awake()
     {
         #region Singleton
@@ -75,7 +75,6 @@ public class GameManager : Managment
         CheckGloworms(0);
         currentLinesNumText.text = "0 /";
         boundText.text = firstBound.ToString();
-
     }
     public void WinAnimation()
     {
@@ -122,8 +121,9 @@ public class GameManager : Managment
         {
             if (flag == 0)
                 lineNumber--;
-            else
+            else if(flag == 1)
                 lineNumber++;
+            
             currentLinesNumText.text = lineNumber.ToString() + " /";
             if (lineNumber > thirdBound)
             {

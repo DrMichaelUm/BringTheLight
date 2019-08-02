@@ -93,7 +93,7 @@ public class BottleScript : Managment
     protected void ActivateFullnessAnimation()
     {
         bottles[bottleNumber].isFull = true;
-        Debug.Log("Well.."+(scrollPane.GetComponent<RectTransform>().rect.height + expandScrolling_num).ToString());
+        //Debug.Log("Well.."+(scrollPane.GetComponent<RectTransform>().rect.height + expandScrolling_num).ToString());
         scrollPane.sizeDelta = new Vector2(scrollPane.sizeDelta.x, scrollPane.sizeDelta.y + Screen.currentResolution.height);
 
 
