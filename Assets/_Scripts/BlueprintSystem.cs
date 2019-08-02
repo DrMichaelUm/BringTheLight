@@ -158,15 +158,15 @@ public class ShinyFactory : MonoBehaviour
 
     protected void InitLine(Transform parent)
     {
-        GameObject Line = Instantiate(linePrefab);
-        Line.transform.SetParent(parent);
+        GameObject Line = ObjectPoolingManager.Instance.GetShinyLine(parent);
         activeLine = Line.GetComponent<ShinyLineScript>();
-        activeLine.center = center;
         col = NormilizeColor(col);
         activeLine.col = col;
+        Debug.Log("Color is set");
+        activeLine.center = center;
         activeLine.startLine = true;
+        activeLine.Restart();
     }
-
 }
     
     public abstract class Line : ShinyFactory

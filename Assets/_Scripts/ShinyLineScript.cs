@@ -28,12 +28,18 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     Vector3 _direction;
     float tempAxis;
     bool destroyLine = false;
+
     private void Start()
     {
         gameManager = GameManager.Instance;
         rt = GetComponent<RectTransform>();
         lineRenderer = GetComponent<LineRenderer>();
         edgeCol = GetComponent<EdgeCollider2D>();
+    }
+
+    public void Restart()
+    {
+        Debug.Log("Line Enabled");
         ps = GetComponentInChildren<ParticleSystem>();
         mat = ps.GetComponent<Renderer>().material;
         mat.SetColor("_TintColor", col);
@@ -244,7 +250,18 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     {
         if (parentTargetNode != null && parentTargetNode.numOfLines <= 0)
             parentTargetNode.initializator = false;
-        Destroy(gameObject);
 
+        WhenDestroyed();
+        gameObject.SetActive(false);
+    }
+
+    private void WhenDestroyed() //обнуляет переменные
+    {
+        points = new List<Vector2>();
+        targetNode = null;
+        answerNode = null;
+        parentTargetNode = null;
+        activateAnswer = false;
+        destroyLine = false;
     }
 }

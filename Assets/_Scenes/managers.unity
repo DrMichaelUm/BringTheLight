@@ -97,7 +97,7 @@ LightmapSettings:
     m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -284,6 +284,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1579463405}
   - component: {fileID: 1579463404}
+  - component: {fileID: 1579463406}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -305,7 +306,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelConfigName: 
   app: {fileID: 675344022}
-  currentLevelNum: 0
   inTarget: 0
   endPoint: {x: 0, y: 0}
   requiredAnswers: 1
@@ -319,7 +319,6 @@ MonoBehaviour:
   gloworms: []
   flowers: []
   nodeNumeration: 50
-  text: {fileID: 4900000, guid: 00eefd074f16b36479a4804bd36ec592, type: 3}
 --- !u!4 &1579463405
 Transform:
   m_ObjectHideFlags: 0
@@ -334,6 +333,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1579463406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579463403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865a29ab9aeab174d8dc31851f7d9a49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shinyLinePrefab: {fileID: 9042743121812694396, guid: 1ed1271d4c8d6254f8343a0350120b30,
+    type: 3}
 --- !u!1 &1643350766
 GameObject:
   m_ObjectHideFlags: 0
