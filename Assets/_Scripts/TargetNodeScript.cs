@@ -32,25 +32,25 @@ public class TargetNodeScript : Node
             //Debug.Log("Line collided!");
             line = collision.GetComponent<ShinyLineScript>();
             //Debug.Log(line.dot2.x + " " + center.x + "    " + line.dot2.y + " " + center.y);
-            //if ((line.dot2.x < center.x + 0.6f && line.dot2.x > center.x - 0.6f) && (line.dot2.y < center.y + 0.6f && line.dot2.y > center.y - 0.6f))
-            //{
-            if (line.startLine)
+            //if ((line.dot2.x-0.2f < center.x + 0.6f && line.dot2.x-0.2f > center.x - 0.6f) && (line.dot2.y+0.2f > center.y - 0.6f && line.dot2.y+0.2f < center.y + 0.6f))
             {
-
-                line.targetNode = GetComponent<TargetNodeScript>();
-                if (line.parentTargetNode != line.targetNode)
+                if (line.startLine)
                 {
 
-                    line.activateAnswer = false;
-                    line.answerNode = null;
-                    OnMouseEnterFunction();
-                }
-                else
-                {
-                    line.targetNode = null;
+                    line.targetNode = GetComponent<TargetNodeScript>();
+                    if (line.parentTargetNode != line.targetNode)
+                    {
+
+                        line.activateAnswer = false;
+                        line.answerNode = null;
+                        OnMouseEnterFunction();
+                    }
+                    else
+                    {
+                        line.targetNode = null;
+                    }
                 }
             }
-            //}
         }
     }
 

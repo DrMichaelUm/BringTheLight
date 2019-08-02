@@ -70,9 +70,9 @@ public class GameManager : Managment
         secondBound = _secondBound;
         thirdBound = _thirdBound;
         requiredAnswers = _requiredAnswers;
-        lineNumber = 1;
+        lineNumber = 0;
         numOfRightAnswers = 0;
-        CheckGloworms(0);
+        CheckGloworms(-1);
         currentLinesNumText.text = "0 /";
         boundText.text = firstBound.ToString();
     }
@@ -84,11 +84,10 @@ public class GameManager : Managment
             {
                 flower.GetComponent<Animator>().SetTrigger("EndedFlowerAnimation");
             }
-
-            if (levelConfigName != null && levelConfigName != "" && glowormNumber>levels[levelConfigName].gloworms)
+           
+            if (levelConfigName != null && levelConfigName != "")
             {
                 levels[levelConfigName].gloworms = glowormNumber;
-
                 foreach (var level in levels)
                 json = json+JsonConvert.SerializeObject(level.Value)+",\n";
 
@@ -105,7 +104,7 @@ public class GameManager : Managment
             }
 
             rootGlowerAnimator.SetTrigger("EndTheLevel");
-            StartCoroutine(LoadMenuCoroutine());
+            //StartCoroutine(LoadMenuCoroutine());
         }
     }
 
@@ -117,6 +116,7 @@ public class GameManager : Managment
 
     public void CheckGloworms(int flag)
     {
+        
         if (gloworms != null && boundText != null && currentLinesNumText != null)
         {
             if (flag == 0)
@@ -149,6 +149,7 @@ public class GameManager : Managment
                 glowormNumber = 3;
                 boundText.text = " " + firstBound.ToString();
             }
+
         }
     }
 

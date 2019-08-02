@@ -84,6 +84,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                                 answerNode.inColors.Add(col);
                                 answerNode.col = MixColors(answerNode.inColors);
                                 answerNode.activated = true;
+                                gameManager.CheckGloworms(1);
                                 answerNode.CheckAnswer();
                             }
                             else
@@ -105,6 +106,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                             targetNode.inColors.Add(col);
                             targetNode.col = MixColors(targetNode.inColors);
                             targetNode.col = NormilizeColor(targetNode.col);
+                            gameManager.CheckGloworms(1);
                             targetNode.mat.SetColor("_TintColor", targetNode.col);
                         }
                         else
@@ -119,7 +121,6 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        gameManager.CheckGloworms(1);
                         var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
                         gameManager.lines.Add(lineData);
 
