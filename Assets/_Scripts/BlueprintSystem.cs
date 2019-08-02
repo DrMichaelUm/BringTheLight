@@ -8,9 +8,10 @@ using TMPro;
 
 
 public class Configs : MonoBehaviour
-{
+{   
+    //Стартовые конфиги
     protected string levelConfigText = @"[
-                                            {'level':'level_1', 'gloworms':0},
+                                            {'level':'level_1', 'gloworms':0},  
                                             {'level':'level_2','gloworms':0},
                                             {'level':'level_3','gloworms':0},
                                             {'level':'level_4','gloworms':0},
@@ -37,8 +38,8 @@ public class Configs : MonoBehaviour
                                             {'bottleNumber':2,'gloworms':0,'isFull':false},
                                             {'bottleNumber':3,'gloworms':0,'isFull':false},
                                           ]";
-
-    protected Dictionary<string, LevelConfig> levels;
+    //Словари для записи и оперирования конфигами
+    protected Dictionary<string, LevelConfig> levels;   
     protected Dictionary<int, BottleConfig> bottles;
 
     protected void FindLevelConfig()
@@ -75,7 +76,7 @@ public class Configs : MonoBehaviour
 
 public class Managment : Configs
 {
-
+    //Функция отключения имейджей светляков. Надо передать список объектов светляков(с УИ) и кол-во которое надо отключить
     public void DisableGloworms(List<GameObject> gloworms, int disableNum)
     {
         foreach (GameObject gloworm in gloworms)
@@ -89,13 +90,14 @@ public class Managment : Configs
     }
 
 }
-public class ShinyFactory : MonoBehaviour
+//Фабрика всего что на поле
+public class ShinyFactory : MonoBehaviour 
 {
-    public Color col;
-    public Color originColor;
-    public Material mat;
-    public Vector2 center;
-    public bool startLine = false;
+    public Color col;           //Текущий цвет(линии или любого узла)
+    public Color originColor;   //Изначальный цвет узла
+    public Material mat;        //Материал партикла
+    public Vector2 center;      //Центр объекта(линии или узла)
+    public bool startLine = false; //Булевая переменная, означает что сейчас(или буквально вот фрейм назад) линия ведётся мышкой
     //protected Color clearColor = new Color(float.NaN, float.NaN, float.NaN, float.NaN);
 
     protected static Color MixColors(List<Color> inColors)
@@ -107,7 +109,7 @@ public class ShinyFactory : MonoBehaviour
         }
         resultColor /= inColors.Count;
         return resultColor;
-    }
+    } //Смешиваем цвет
 
     protected Color NormilizeColor(Color color)
     {
@@ -116,35 +118,34 @@ public class ShinyFactory : MonoBehaviour
         color = Color.HSVToRGB(H, S, V);
         color.a = 0.5f;
         return color;
-    }
+    }            //Приводим цвет к единому стандарту
 }
+//Абстрактный класс узла, наследуем от фабрикм
     public abstract class Node : ShinyFactory
     {
-        public List<Color> inColors = new List<Color>();
-        //public List<ShinyLineScript> outLines = new List<ShinyLineScript>();
-        public int numOfLines = 0;
-        public bool inTarget = false;
-        //public bool targetN = false;
-        protected Renderer ren;
-        public ParticleSystem ps;
-        public GameObject linePrefab;
-        protected ShinyLineScript activeLine;
-        public int index;
-    protected void OnMouseEnterFunction()
+        public List<Color> inColors = new List<Color>();  //Список всех цветов которые входят в узел
+        public int numOfLines = 0;                        //Количество лмнмй которые выходят из узла
+        public bool inTarget = false;                     //Аналог переменной из gameManager, показывает попадает ли сейчас линия на узел
+        protected Renderer ren;                           //Рендер
+        public ParticleSystem ps;                         //Наш партикл
+        public GameObject linePrefab;                     //Префаб линии, чтоб создать её, в случае чего
+        protected ShinyLineScript activeLine;             //Скрипт линии, которую узел только создал
+        public int index;                                 //Индекс узла
+    protected void OnMouseEnterFunction()                 //Функция, выполняемая при пресесении линии и узла
     {
             inTarget = true;
             Debug.Log("InTarget!");
-            GameManager.Instance.inTarget = inTarget;
-            GameManager.Instance.endPoint = center;
+            GameManager.Instance.inTarget = inTarget;     //обязательно говорим менеджеру что линия попала на узел
+            GameManager.Instance.endPoint = center;       //Передаём в менеджер конечную точку для линии
     }
-    protected void OnMouseExitFunction()
+    protected void OnMouseExitFunction()                  //Функция, выполняемая при выходе линии с узла
     {
             inTarget = false;
             Debug.Log("OutOfTarget!");
             GameManager.Instance.inTarget = inTarget;
     }
 
-    protected void InitFunction()
+    protected void InitFunction()                         //Функция, которую вызывает узел в Start()
     {
         ps = GetComponentInChildren<ParticleSystem>();
         if (ps != null)
@@ -156,7 +157,7 @@ public class ShinyFactory : MonoBehaviour
         center = new Vector2(transform.position.x, transform.position.y);
     }
 
-    protected void InitLine(Transform parent)
+    protected void InitLine(Transform parent)            //Инициализируем линию
     {
         GameObject Line = Instantiate(linePrefab);
         Line.transform.SetParent(parent);
