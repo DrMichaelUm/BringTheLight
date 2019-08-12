@@ -9,6 +9,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     EdgeCollider2D edgeCol;
     Vector3 mousePosition;
     List<Vector2> points = new List<Vector2>();
+    public List<GameObject> detectedNodes = new List<GameObject>();
     public Vector2 dot1, dot2;
     public Vector2 endPoint;
     public TargetNodeScript targetNode;
@@ -67,17 +68,13 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
             {
                 if (gameManager.inTarget)
                 {
-                    endPoint = gameManager.endPoint;
-                    dot2 = endPoint;
 
-                    LineBehaviour();
-
-                    this.gameObject.layer = 0;
 
                     if (activateAnswer)
-                    {
+                    {   
                         if (answerNode != null && !answerNode.activated)
                         {
+                            endPoint = answerNode.center;
                             targetNodeIndex = answerNode.index;
                             if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
                             {
@@ -94,20 +91,29 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                         }
                     }
                     else
-                    if (targetNode != null && !targetNode.initializator)
                     {
-                        targetNodeIndex = targetNode.index;
-                        if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
+                        targetNode = CheckTargetNode(detectedNodes);
+                        if (targetNode != null && parentTargetNode != targetNode && !targetNode.initializator)
                         {
-                            if (!targetNode.activate)
+                            endPoint = targetNode.center;
+                            targetNodeIndex = targetNode.index;
+                            if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
                             {
-                                targetNode.activate = true;
+                                if (!targetNode.activate)
+                                {
+                                    targetNode.activate = true;
+                                }
+                                
+                                targetNode.inColors.Add(col);
+                                targetNode.col = MixColors(targetNode.inColors);
+                                targetNode.col = NormilizeColor(targetNode.col);
+                                gameManager.CheckGloworms(1);
+                                targetNode.mat.SetColor("_TintColor", targetNode.col);
                             }
-                            targetNode.inColors.Add(col);
-                            targetNode.col = MixColors(targetNode.inColors);
-                            targetNode.col = NormilizeColor(targetNode.col);
-                            gameManager.CheckGloworms(1);
-                            targetNode.mat.SetColor("_TintColor", targetNode.col);
+                            else
+                            {
+                                destroyLine = true;
+                            }
                         }
                         else
                         {
@@ -121,6 +127,11 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
+                        dot2 = endPoint;
+                        LineBehaviour();
+
+                        this.gameObject.layer = 0;
+
                         var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
                         gameManager.lines.Add(lineData);
 
@@ -264,5 +275,25 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         parentTargetNode = null;
         activateAnswer = false;
         destroyLine = false;
+        detectedNodes.Clear();
+    }
+
+    private TargetNodeScript CheckTargetNode(List<GameObject> nodes)
+    {
+        if (nodes.Count > 0)
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint((new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                if (Vector2.Distance(mousePos, nodes[i].transform.position) < 0.6f)
+                {
+                    Debug.Log("Yeahh!It's Working!");
+                    return nodes[i].GetComponent<TargetNodeScript>();
+                }
+
+            }
+        }
+        return null;
+        
     }
 }

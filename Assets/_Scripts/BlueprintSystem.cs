@@ -90,6 +90,7 @@ public class Managment : Configs
     }
 
 }
+
 //Фабрика всего что на поле
 public class ShinyFactory : MonoBehaviour 
 {
@@ -120,10 +121,12 @@ public class ShinyFactory : MonoBehaviour
         return color;
     }            //Приводим цвет к единому стандарту
 }
+
 //Абстрактный класс узла, наследуем от фабрикм
     public abstract class Node : ShinyFactory
     {
         public List<Color> inColors = new List<Color>();  //Список всех цветов которые входят в узел
+        public List<ShinyLineScript> outLines = new List<ShinyLineScript>(); //Список всех линий, которые выходят из узла
         public int numOfLines = 0;                        //Количество лмнмй которые выходят из узла
         public bool inTarget = false;                     //Аналог переменной из gameManager, показывает попадает ли сейчас линия на узел
         protected Renderer ren;                           //Рендер
