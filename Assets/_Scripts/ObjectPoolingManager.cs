@@ -20,7 +20,7 @@ public class ObjectPoolingManager : MonoBehaviour
     {
         for (int i = 0; i < shinyLines.Count; i++) //ищем доступный для переиспользования объект
         {
-            if (!shinyLines[i].activeInHierarchy)
+            if (shinyLines[i] != null && !shinyLines[i].activeInHierarchy)
             {
                 shinyLines[i].SetActive(true);
                 shinyLines[i].transform.SetParent(parent);
