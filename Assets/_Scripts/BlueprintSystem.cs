@@ -120,6 +120,113 @@ public class ShinyFactory : MonoBehaviour
         color.a = 0.5f;
         return color;
     }            //Приводим цвет к единому стандарту
+
+    protected void StartCIC(Node target, Color newCol, bool flag) //цепное изменение цвета
+    {
+        Debug.Log("Mixing CIC");
+
+        if (flag)
+            target.inColors.Add(newCol);
+        else
+            target.inColors.Remove(newCol);
+        target.col = MixColors(target.inColors);
+        target.col = NormilizeColor(target.col);
+        if (target.inColors.Count != 0)
+        {
+            target.mat.SetColor("_TintColor", target.col);
+        }
+        else
+        {
+            target.mat.SetColor("_TintColor", target.originColor);
+            target.activate = false;
+
+        }
+        //target.mat.SetColor("_TintColor", target.col);
+        for (int i = 0; i < target.outLines.Count; i++)
+        {
+            StartCIC(target.outLines[i].targetNode, newCol, flag);
+        }
+    }
+
+    protected int CheckForLoops(Node origin, Node target) //проверяет, не попадем ли мы в замкнутый круг
+    {
+        if (origin == null)
+        { 
+            Debug.Log("no origin");
+            return 3;
+        }
+        int deepth = 0;
+        // Stack<Node> toCheck = new Stack<Node>();
+        List<Node> toCheck = new List<Node>();
+        toCheck = InsertIntoStack(toCheck, target);
+        Debug.Log("org: " + origin.index + " targ: " + target.index);
+        while (deepth < 10 && toCheck != null && toCheck.Count != 0 && target != null && target.index != origin.index)
+        {
+            Debug.Log("org: " + origin.index + " targ: " + target.index);
+         /*   if (toCheck.Count == 0)
+            {
+                Debug.Log("Empty List");
+                return 0;
+            }*/
+            Debug.Log("Checking loops...");
+            deepth = deepth + 1;
+            target = toCheck[0]; // toCheck.Pop();
+            toCheck.RemoveAt(0);
+            if (target != null)
+                toCheck = InsertIntoStack(toCheck, target);
+        }
+        Debug.Log("org: " + origin.index + " targ: " + target.index);
+        if (deepth >= 10)
+        {
+            Debug.Log("You are loh in infinity");
+            return 1;
+        }
+
+       else if (target == origin)
+        {
+            Debug.Log("Loop");
+            return 1;
+        }
+        
+        else if (toCheck.Count == 0)
+        {
+            Debug.Log("All checked, no loop");
+            return 0;
+        }
+        else if (target == null)
+        {
+            Debug.Log("target == null, don't know how, probably no loop");
+            return 0;
+        }
+        return 2;
+        /*if (deepth > 100)
+        {
+            Debug.Log("You are loh in infinity");
+            return 1;
+        }
+        if (target.outLines.Count == 0) //если дочерних линий нет, то дальше петли нам искать негде
+            return 0;
+        if (origin == target) //если узлы совпадают, то мы нашли петлю
+            return 1;
+
+        int result = 0;
+        for (int i = 0; i < target.outLines.Count; i++) //проходимся по каждой из линий и вызываем для всех узлов эту функцию
+        {
+            result = CheckForLoops(origin, target.outLines[i].targetNode, deepth + 1);
+            if (result == 1) //если хотя бы раз нашли совпадение, то выходим
+                return 1;
+        }
+        return 0;*/
+    }
+    private List<Node> InsertIntoStack(List<Node> toCheck, Node target)
+    {
+        for (int i = 0; i < target.outLines.Count; i++)
+        {
+            toCheck.Add(target.outLines[i].targetNode);
+        }
+        return toCheck;
+    }
+
 }
 
 //Абстрактный класс узла, наследуем от фабрикм
@@ -134,6 +241,7 @@ public class ShinyFactory : MonoBehaviour
         public GameObject linePrefab;                     //Префаб линии, чтоб создать её, в случае чего
         protected ShinyLineScript activeLine;             //Скрипт линии, которую узел только создал
         public int index;                                 //Индекс узла
+        public bool activate = false;
     protected void OnMouseEnterFunction()                 //Функция, выполняемая при пресесении линии и узла
     {
             inTarget = true;

@@ -11,12 +11,12 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     //List<Vector2> points = new List<Vector2>();
     public List<GameObject> detectedNodes = new List<GameObject>();
     //public Vector2 dot1, dot2;
-    public Vector2 endPoint;
-    private Vector2[] points = new Vector2[2];
+    //public Vector2 endPoint;
+    private Vector2[] points = new Vector2[2]; //[0] - начало линии, [1] - конец
     
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
-    public TargetNodeScript parentTargetNode;
+    public Node parentTargetNode;
     public int parentNodeIndex;
     int targetNodeIndex;
     ParticleSystem ps;
@@ -66,23 +66,25 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
         if (Input.GetMouseButtonUp(0)) //если отпустить мышь
         {
+            Debug.Log("Up");
             if (startLine) //если линия была "начата"
             {
+
                 if (gameManager.inTarget) //если линия попала в какой-то узел
                 {
 
 
-                    if (activateAnswer)
+                    if (activateAnswer) //если задели узел ответа?
                     {   
-                        if (answerNode != null && !answerNode.activated)
+                        if (answerNode != null && !answerNode.activate)
                         {
-                            endPoint = answerNode.center;
+                            points[1] = answerNode.center;
                             targetNodeIndex = answerNode.index;
                             if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
                             {
                                 answerNode.inColors.Add(col);
                                 answerNode.col = MixColors(answerNode.inColors);
-                                answerNode.activated = true;
+                                answerNode.activate = true;
                                 gameManager.CheckGloworms(1);
                                 answerNode.CheckAnswer();
                             }
@@ -94,23 +96,46 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        targetNode = CheckTargetNode(detectedNodes);
-                        if (targetNode != null && parentTargetNode != targetNode && !targetNode.initializator)
+                        targetNode = CheckTargetNode(detectedNodes); //выбрать оптимальную TargetNode из задетых
+                        Debug.Log("Before");
+                        if (targetNode != null && parentTargetNode != targetNode && CheckForLoops(parentTargetNode, targetNode) == 0/*&& !targetNode.initializator*/) //если выбран узел и он не равен узлу, с которого мы начали
                         {
-                            endPoint = targetNode.center;
+                            Debug.Log("After");
+                         //   if (CheckForLoops(parentTargetNode, targetNode) == 0) //если не попадем в петлю, то можно рисовать линию
+                          //  {
+                                if (parentTargetNode == null)
+                                    Debug.Log("no parent");
+                                else if (parentTargetNode.outLines == null)
+                                    Debug.Log("no list");
+                                else
+                                    parentTargetNode.outLines.Add(this);
+                            Debug.Log("StartCIC()");
+                                StartCIC(targetNode, col, true);
+                            /*
+                            targetNode.inColors.Add(col);
+                            targetNode.col = MixColors(targetNode.inColors);
+                            targetNode.col = NormilizeColor(targetNode.col);
+                            */
+                            Debug.Log("After CIC");
+                                gameManager.CheckGloworms(1);
+                                //targetNode.mat.SetColor("_TintColor", targetNode.col);
+                      //      }
+                       //     else
+                         //   {
+                              //  Debug.Log("Loop, destroy");
+                             //   destroyLine = true;
+                           // }
+                            points[1] = targetNode.center;
                             targetNodeIndex = targetNode.index;
-                            if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
+
+                            if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1) //не повторяется ли линия
                             {
-                                if (!targetNode.activate)
+                                if (!targetNode.activate) //если к узлу еще не проводились линии
                                 {
                                     targetNode.activate = true;
                                 }
-                                
-                                targetNode.inColors.Add(col);
-                                targetNode.col = MixColors(targetNode.inColors);
-                                targetNode.col = NormilizeColor(targetNode.col);
-                                gameManager.CheckGloworms(1);
-                                targetNode.mat.SetColor("_TintColor", targetNode.col);
+
+                              
                             }
                             else
                             {
@@ -129,7 +154,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        points[1] = endPoint;
+                       // points[1] = endPoint; // (по идее значение уже присвоилось раньше)
                         LineBehaviour();
 
                         this.gameObject.layer = 0;
@@ -137,8 +162,8 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                         var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
                         gameManager.lines.Add(lineData);
 
-                        if (parentTargetNode != null)
-                            parentTargetNode.numOfLines++;
+                       // if (parentTargetNode != null)
+                            //parentTargetNode.numOfLines++;
                         gameManager.inTarget = false;
                     }
                 }
@@ -177,7 +202,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     private void OnMouseDown()
     {
-        if (activateAnswer || (targetNode != null && !targetNode.initializator))
+        if (activateAnswer || (targetNode != null /*!targetNode.initializator*/))
         {
             clicked++;
             if (clicked == 1) clicktime = Time.time;
@@ -187,12 +212,12 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                 clicked = 0;
                 clicktime = 0;
 
-                if (parentTargetNode != null)
+                /*if (parentTargetNode != null)
                 {
                     parentTargetNode.numOfLines--;
                     if (parentTargetNode.numOfLines == 0)
                         parentTargetNode.initializator = false;
-                }
+                }*/
 
                 if (activateAnswer)
                 {
@@ -200,23 +225,14 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     answerNode.col = MixColors(answerNode.inColors);
                     answerNode.CheckAnswer();
                     activateAnswer = false;
-                    answerNode.activated = false;
+                    answerNode.activate = false;
                 }
                 else
                 {
-                    targetNode.inColors.Remove(col);
-                    targetNode.col = MixColors(targetNode.inColors);
-                    targetNode.col = NormilizeColor(targetNode.col);
-                    if (targetNode.inColors.Count != 0)
-                    {
-                        targetNode.mat.SetColor("_TintColor", targetNode.col);
-                    }
-                    else
-                    {
-                        targetNode.mat.SetColor("_TintColor", targetNode.originColor);
-                        targetNode.activate = false;
-
-                    }
+                    StartCIC(targetNode, col, false);
+                   /* targetNode.col = MixColors(targetNode.inColors);
+                    targetNode.col = NormilizeColor(targetNode.col);*/
+                   
                 }
                 var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
                 gameManager.lines.Remove(lineData);
@@ -262,9 +278,9 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     void DestroyLine()
     {
-        if (parentTargetNode != null && parentTargetNode.numOfLines <= 0)
+        /*if (parentTargetNode != null && parentTargetNode.numOfLines <= 0)
             parentTargetNode.initializator = false;
-
+            */
         WhenDestroyed();
         gameObject.SetActive(false);
     }

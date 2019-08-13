@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TargetNodeScript : Node
 {
-    public bool activate = false;
     public bool initializator = false;
     ShinyLineScript line;
     private void Start()
@@ -19,15 +18,15 @@ public class TargetNodeScript : Node
         if (activate)
         {
             InitLine(this.transform);
-            initializator = true;
-            activeLine.parentTargetNode = GetComponent<TargetNodeScript>();
+           // initializator = true;
+            activeLine.parentTargetNode = GetComponent<Node>();
             activeLine.parentNodeIndex = index;
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("ShinyLine") && !initializator)
+        if (collision.CompareTag("ShinyLine") /*&& !initializator*/)
         {
             //Debug.Log("Line collided!");
             line = collision.GetComponent<ShinyLineScript>();
@@ -57,13 +56,13 @@ public class TargetNodeScript : Node
     //}
     private void OnMouseExit()
     {
-        if (!initializator)
-        {
+       // if (!initializator)
+       // {
             //if (line != null && line.startLine)
             //{
             //    line.targetNode = null;
             //}
             OnMouseExitFunction();
-        }
+       // }
     }
 }

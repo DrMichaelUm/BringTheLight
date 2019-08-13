@@ -16,6 +16,7 @@ public class ShinyNodeScript : Node
     private void OnMouseDown()
     {
         InitLine(this.transform);
+        activeLine.parentTargetNode = GetComponent<Node>();
         activeLine.parentNodeIndex = index;
     }
 
