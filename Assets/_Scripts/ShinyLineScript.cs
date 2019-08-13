@@ -8,10 +8,12 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     LineRenderer lineRenderer;
     EdgeCollider2D edgeCol;
     Vector3 mousePosition;
-    List<Vector2> points = new List<Vector2>();
+    //List<Vector2> points = new List<Vector2>();
     public List<GameObject> detectedNodes = new List<GameObject>();
-    public Vector2 dot1, dot2;
+    //public Vector2 dot1, dot2;
     public Vector2 endPoint;
+    private Vector2[] points = new Vector2[2];
+    
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
     public TargetNodeScript parentTargetNode;
@@ -49,24 +51,24 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     private void Update()
     {
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0)) //пока мышь нажата, просто прорисовываем линию следом за ней
         {
             if (startLine)
             {
                 mousePosition = Camera.main.ScreenToWorldPoint((new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
 
-                dot1 = center;
-                dot2 = (Vector2)(new Vector3(mousePosition.x, mousePosition.y, 0));
+                points[0] = center;
+                points[1] = (Vector2)(new Vector3(mousePosition.x, mousePosition.y, 0));
 
                 LineBehaviour();
             }
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0)) //если отпустить мышь
         {
-            if (startLine)
+            if (startLine) //если линия была "начата"
             {
-                if (gameManager.inTarget)
+                if (gameManager.inTarget) //если линия попала в какой-то узел
                 {
 
 
@@ -127,7 +129,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        dot2 = endPoint;
+                        points[1] = endPoint;
                         LineBehaviour();
 
                         this.gameObject.layer = 0;
@@ -227,20 +229,20 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         }
     }
 
-    private void LineBehaviour()
+    private void LineBehaviour() //отвечает за прорисовку линии следом за мышкой
     {
         //this.transform.position = new Vector2((dot1.x + dot2.x) / 2, (dot1.y + dot2.y) / 2);
-        lineRenderer.SetPosition(0, dot1);
-        lineRenderer.SetPosition(1, dot2);
+        lineRenderer.SetPosition(0, points[0] /*dot1*/);
+        lineRenderer.SetPosition(1, points[1] /*dot2*/);
 
         #region Настраиваем партикл
-        particleTransform.position = new Vector2((dot1.x + dot2.x) / 2, (dot1.y + dot2.y) / 2);
-        _direction = (dot1 - (Vector2)particleTransform.transform.position).normalized;
+        particleTransform.position = new Vector2((points[0].x + points[1].x) / 2, (points[0].y + points[1].y) / 2);
+        _direction = (points[0] - (Vector2)particleTransform.transform.position).normalized;
         _lookRotation = Quaternion.LookRotation(_direction);
         tempAxis = _lookRotation.x;
         _lookRotation.x = 0f;
         _lookRotation.y = 0f;
-        if (dot1.x < dot2.x)
+        if (points[0].x < points[1].x)
         {
             _lookRotation.z = tempAxis;
         }
@@ -250,12 +252,12 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         }
         particleTransform.rotation = _lookRotation;
         var psShape = ps.shape;
-        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((dot2.x - dot1.x), 2) + Mathf.Pow((dot2.y - dot1.y), 2)) * 0.9f, 0f, 0f);
+        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((points[0].x - points[1].x), 2) + Mathf.Pow((points[0].y - points[1].y), 2)) * 0.9f, 0f, 0f);
         #endregion
-        points.Add(dot1);
-        points.Add(dot2);
-        edgeCol.points = points.ToArray();
-        points.Clear();
+       // points.Add(dot1);
+       // points.Add(dot2);
+        edgeCol.points = points; //.ToArray();
+        //points.Clear();
     }
 
     void DestroyLine()
@@ -269,7 +271,8 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     private void WhenDestroyed() //обнуляет переменные
     {
-        points = new List<Vector2>();
+        //points = new List<Vector2>();
+        points = new Vector2[2];
         targetNode = null;
         answerNode = null;
         parentTargetNode = null;
