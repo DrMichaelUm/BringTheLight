@@ -15,12 +15,14 @@ public class GameManager : Managment
     string json;
     
     public ApplicationController app;
-
+    [Header("Game")]
+    public bool win = false;
+    public int levelOpened = 9;
+    [Header("LevelPerfomance")]
     public bool inTarget = false;
     public Vector2 endPoint;
     public int requiredAnswers = 3;
     public int numOfRightAnswers = 0;
-    public bool win = false;
     public int lineNumber;
     public int firstBound;
     public int secondBound;

@@ -15,6 +15,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
     public TargetNodeScript parentTargetNode;
+    GameObject inNode;
     public int parentNodeIndex;
     int targetNodeIndex;
     ParticleSystem ps;
@@ -69,9 +70,15 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                 if (gameManager.inTarget)
                 {
 
+                    inNode = CheckTargetNode(detectedNodes);
 
                     if (activateAnswer)
-                    {   
+                    {
+                        if (inNode != null)
+                            answerNode = inNode.GetComponent<AnswerNodeScript>();
+                        else
+                            answerNode = null;
+
                         if (answerNode != null && !answerNode.activated)
                         {
                             endPoint = answerNode.center;
@@ -92,7 +99,11 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        targetNode = CheckTargetNode(detectedNodes);
+                        if (inNode != null)
+                            targetNode = inNode.GetComponent<TargetNodeScript>();
+                        else
+                            targetNode = null;
+
                         if (targetNode != null && parentTargetNode != targetNode && !targetNode.initializator)
                         {
                             endPoint = targetNode.center;
@@ -278,7 +289,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         detectedNodes.Clear();
     }
 
-    private TargetNodeScript CheckTargetNode(List<GameObject> nodes)
+    private GameObject CheckTargetNode(List<GameObject> nodes)
     {
         if (nodes.Count > 0)
         {
@@ -288,7 +299,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                 if (Vector2.Distance(mousePos, nodes[i].transform.position) < 0.6f)
                 {
                     Debug.Log("Yeahh!It's Working!");
-                    return nodes[i].GetComponent<TargetNodeScript>();
+                    return nodes[i];
                 }
 
             }

@@ -53,22 +53,25 @@ public class AnswerNodeScript : Node
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("ShinyLine"))
-            if (!activated)
+        {
+            line = other.GetComponent<ShinyLineScript>();
+            if (!activated && line.startLine)
             {
                 OnMouseEnterFunction();
-                line = other.GetComponent<ShinyLineScript>();
-                line.answerNode = GetComponent<AnswerNodeScript>();
+                if (!line.detectedNodes.Contains(gameObject))
+                    line.detectedNodes.Add(gameObject);
                 line.activateAnswer = true;
                 line.targetNode = null;
             }
+        }
     }
     private void OnMouseExit()
     {
-        if (line != null && line.startLine)
-        {
-            line.answerNode = null;
-            line.activateAnswer = false;
-        }
+        //if (line != null && line.startLine)
+        //{
+        //    line.answerNode = null;
+        //    line.activateAnswer = false;
+        //}
         OnMouseExitFunction();
 
     }

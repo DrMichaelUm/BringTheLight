@@ -127,7 +127,7 @@ public class ShinyFactory : MonoBehaviour
     {
         public List<Color> inColors = new List<Color>();  //Список всех цветов которые входят в узел
         public List<ShinyLineScript> outLines = new List<ShinyLineScript>(); //Список всех линий, которые выходят из узла
-        public int numOfLines = 0;                        //Количество лмнмй которые выходят из узла
+        public int numOfLines = 0;                        //Количество линий которые выходят из узла
         public bool inTarget = false;                     //Аналог переменной из gameManager, показывает попадает ли сейчас линия на узел
         protected Renderer ren;                           //Рендер
         public ParticleSystem ps;                         //Наш партикл
