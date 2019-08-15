@@ -236,23 +236,37 @@ public class ShinyFactory : MonoBehaviour
     {
         for (int i = 0; i < parent.outLines.Count; i++)
         {
+            bool isAnswer = false;
             Node target = parent.outLines[i].targetNode;
+            if (target == null)
+            {
+                target = parent.outLines[i].answerNode;
+                isAnswer = true;
+            }
             Color oldCol = target.col;
             if (target.inColors.Contains(removedCol)) //замещаем старый цвет на новый
             {
                 target.inColors.Remove(removedCol);
                 if (parent.activate) //если родительский узел еще активен, то добавляем его новый цвет. Если нет - просто удаляем
                     target.inColors.Add(parent.col);
-                //установить новый цвет
+
                 if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
                 {
                     target.col = NormilizeColor(MixColors(target.inColors));
-                    target.mat.SetColor("_TintColor", target.col);
+                    if (!isAnswer) //если узел не является узлом ответа, то обновляем его цвет
+                        target.mat.SetColor("_TintColor", target.col);
+                    else //если это узел отета, то делаем проверку
+                        target.GetComponent<AnswerNodeScript>().CheckAnswer();
                 }
-                else //если нет - выключаем узел
+                else //если цветов не осталось - выключаем узел
                 {
                     target.mat.SetColor("_TintColor", target.originColor);
                     target.activate = false;
+                    if (isAnswer)
+                    {
+                        target.GetComponent<AnswerNodeScript>().CheckAnswer();
+                        parent.outLines[i].activateAnswer = false;
+                    }
                 }
             }
             else
@@ -270,7 +284,6 @@ public class ShinyFactory : MonoBehaviour
             }
             CICRefreshColors(target, oldCol); //аналогично меняем цвет в дочерних узлах target
         }
-
         parent.RefreshOutLines();
     }
 
@@ -341,6 +354,8 @@ public class ShinyFactory : MonoBehaviour
             Debug.Log("no origin");
             return 2;
         }
+        if (target == null)
+            Debug.Log("NULL TARGET 1");
         int depth = 0, maxDepth = 30; //чтобы остановить цикл, если он зайдет слишком далеко
         List<Node> toCheck = new List<Node>();
         toCheck = InsertIntoList(toCheck, target);
@@ -350,6 +365,8 @@ public class ShinyFactory : MonoBehaviour
             //Debug.Log("Checking loops...");
             depth = depth + 1;
             target = toCheck[0];
+            if (target == null)
+                Debug.Log("NULL TARGET 2");
             toCheck.RemoveAt(0);
             if (target != null)
                 toCheck = InsertIntoList(toCheck, target);
@@ -381,7 +398,12 @@ public class ShinyFactory : MonoBehaviour
     {
         for (int i = 0; i < target.outLines.Count; i++)
         {
-            toCheck.Add(target.outLines[i].targetNode);
+            Node toAdd = target.outLines[i].targetNode;
+            if (toAdd == null)
+            {
+                toAdd = target.outLines[i].answerNode;
+            }
+            toCheck.Add(toAdd);
         }
         return toCheck;
     }

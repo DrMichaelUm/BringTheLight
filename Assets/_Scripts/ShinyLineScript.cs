@@ -69,7 +69,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
             {
                 if (gameManager.inTarget) //если линия попала в какой-то узел
                 {
-                    if (activateAnswer) //если задели узел ответа?
+                    if (activateAnswer) //если задели узел ответа
                     {   
                         if (answerNode != null && !answerNode.activate)
                         {
@@ -77,6 +77,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                             targetNodeIndex = answerNode.index;
                             if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
                             {
+                                parentTargetNode.outLines.Add(this); //устанавливаем исходящую линию
                                 answerNode.inColors.Add(col);
                                 answerNode.col = MixColors(answerNode.inColors);
                                 answerNode.activate = true;
@@ -191,6 +192,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                 {
                     answerNode.inColors.Remove(col);
                     answerNode.col = MixColors(answerNode.inColors);
+                    parentTargetNode.outLines.Remove(this);
                     answerNode.CheckAnswer();
                     activateAnswer = false;
                     answerNode.activate = false;
@@ -200,7 +202,6 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     StartCICRemovable(targetNode, col);
                     parentTargetNode.outLines.Remove(this);
                     parentTargetNode.RefreshOutLines();
-
                 }
                 StartDestroy();
                 /*if (parentTargetNode != null)
