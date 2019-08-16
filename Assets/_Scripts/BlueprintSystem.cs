@@ -121,129 +121,45 @@ public class ShinyFactory : MonoBehaviour
         return color;
     }            //Приводим цвет к единому стандарту
     
-
- /*   protected void StartCICAdditive(Node target, Color remCol, Color newCol) //цепное изменение цвета при добавлении цвета
+    protected void StartCIC(Node target, Color color, bool additive) //цепное изменение цвета для самого первого узла: только здесь цвет _добавляется_ (если additive == true) или _удаляется_ (если additive =- false) (а не замещается) из списка
     {
         Color oldCol = target.col;
-
-        Debug.Log("Mixing CIC");
-        if (target.inColors.Contains(remCol))
+        if (additive)
         {
-            target.inColors.Remove(remCol);
-            if (newCol != Color.clear && newCol != target.originColor)
-                target.inColors.Add(newCol);
+            target.inColors.Add(color);
+        }
+        else
+        {
+            if(target.inColors.Contains(color))
+                target.inColors.Remove(color);
             else
-                Debug.Log("Clear color");
+                Debug.Log("No color in list. You aren't supposed to see this message, something has gone wrong");
         }
-        else
+        if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
         {
-            Debug.Log("Doesn't contain remCol");
+            target.col = NormilizeColor(MixColors(target.inColors));
+            target.mat.SetColor("_TintColor", target.col);
         }
-        target.col = NormilizeColor(MixColors(target.inColors));
-        target.mat.SetColor("_TintColor", target.col);
-        for (int i = 0; i < target.outLines.Count; i++)
+        else //если нет - выключаем узел
         {
-           // StartCICAdditive(target.outLines[i].targetNode, newCol);
-            target.outLines[i].mat.SetColor("_TintColor", target.col); //у линии, которая исходит из узла, должен быть новый цвет узла
-        }
-
-
-
-    }*/
-
-    protected void StartCICAdditive(Node target, Color newCol) //цепное изменение цвета (добавление цвета) для самого первого узла (только здесь цвет _добавляется_ (а не замещается) в список)
-    {
-        Color oldCol = target.col;
-        target.inColors.Add(newCol);
-        target.col = NormilizeColor(MixColors(target.inColors));
-        target.mat.SetColor("_TintColor", target.col);
-        CICRefreshColors(target, oldCol);
-    }
-
-    protected void StartCICRemovable(Node target, Color delCol) //цепное изменение цвета (удаление цвета) для самого первого узла: только здесь цвет _удаляется_ (а не замещается) из списка
-    {
-        Color oldCol = target.col;
-        if (target.inColors.Contains(delCol))
-        {
-            target.inColors.Remove(delCol);
-            if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
-            {
-                target.col = NormilizeColor(MixColors(target.inColors));
-                target.mat.SetColor("_TintColor", target.col);
-            }
-            else //если нет - выключаем узел
-            {
-                target.mat.SetColor("_TintColor", target.originColor);
-                target.activate = false;
-            }
-        }
-        else
-        {
-            Debug.Log("DelCol not found. YOU DON'T SUPPOSE TO SEE THIS MESSAGE");
+            target.mat.SetColor("_TintColor", target.originColor);
+            target.activate = false;
         }
         CICRefreshColors(target, oldCol); //запускаем обновление цвета в дочерних узлах
     }
 
-    /*protected void StartCICRemovable(Node target, Color remCol, Color newCol) //цепное изменение цвета при удалении цвета
+    private void CICRefreshColors(Node parent, Color removedCol) //заменяет цвет removedCol всех линий, исходящих из parent, и узлов, к которым они ведут, на цвет родительского узла (parent)
     {
-        Color oldCol = target.col; //сохранить старый цвет
-
-        if(target.inColors.Contains(remCol))
+        for (int i = 0; i < parent.outLines.Count; i++) //проходимся по всем исходящим из родителя линиям
         {
-            target.inColors.Remove(remCol);
-            if (newCol != Color.clear && newCol != target.originColor)
-                target.inColors.Add(newCol);
-            else
-                Debug.Log("Clear color");
-            if (target.inColors.Count != 0)
-            {
-                target.col = NormilizeColor(MixColors(target.inColors));
-                target.mat.SetColor("_TintColor", target.col);
-            }
-            else
-            {
-                target.mat.SetColor("_TintColor", target.originColor);
-                target.activate = false;
-            }
-        }
-        else
-        {
-            Debug.Log("StartCICRem no color");
-        }
-        for (int i = 0; i < target.outLines.Count; i++)
-        {
-            if (target.activate)
-            {
-                Debug.Log("target.active == true");
-                target.outLines[i].mat.SetColor("_TintColor", target.col);
-                StartCICRemovable(target.outLines[i].targetNode, oldCol, target.col);
-            }
-            else if (target.inColors.Count == 0)
-            {
-                Debug.Log("target.inColors.Count == 0");
-                StartCICRemovable(target.outLines[i].targetNode, oldCol, Color.clear);
-                target.outLines[i].StartDestroy();
-            }
-            else
-            {
-                Debug.Log("Target " + target.index + " count: " + target.inColors.Count);
-            }
-        }
-        target.RefreshOutLines();
-    }*/
-
-    protected void CICRefreshColors(Node parent, Color removedCol) //заменяет цвет removedCol всех линий, исходящих из parent, и узлов, к которым они ведут, на цвет родительского узла (parent)
-    {
-        for (int i = 0; i < parent.outLines.Count; i++)
-        {
-            bool isAnswer = false;
+            bool isAnswer = false; //индикатор того, работаем мы с обычным узлом или узлом ответа
             Node target = parent.outLines[i].targetNode;
-            if (target == null)
+            if (target == null) //если нет обычного, то будет узел ответа
             {
                 target = parent.outLines[i].answerNode;
                 isAnswer = true;
             }
-            Color oldCol = target.col;
+            Color oldCol = target.col; //сохранить старый цвет
             if (target.inColors.Contains(removedCol)) //замещаем старый цвет на новый
             {
                 target.inColors.Remove(removedCol);
@@ -271,7 +187,7 @@ public class ShinyFactory : MonoBehaviour
             }
             else
             {
-                Debug.Log("RefrColors: doesn't contein remColor. YOU DON'T SUPPOSE TO SEE THIS MESSAGE");
+                Debug.Log("RefreshColors(): doesn't contein remColor. You aren't supposed to see this message, something has gone wrong");
             }
             if (parent.activate) //если родительский узел еще активен, то обновляем цвет исходящих линий
             {
@@ -284,69 +200,9 @@ public class ShinyFactory : MonoBehaviour
             }
             CICRefreshColors(target, oldCol); //аналогично меняем цвет в дочерних узлах target
         }
-        parent.RefreshOutLines();
+        parent.RefreshOutLines(); //обновляем список исходящих линий - некоторых может уже не быть
     }
 
-    #region старый нерабочий код ЦИЦ
-    /*
-    protected void RefreshColors(Node target, Color oldCol) //проходит по цепочке от col и обновляет все цвета в соответствии с ней
-    {
-        for (int i = 0; i < target.outLines.Count; i++)
-        {
-            if (target.outLines[i].targetNode.inColors.Contains(oldCol))
-            {
-                target.outLines[i].mat.SetColor("_TintColor", target.col); //обновить цвет линии
-                Color prevCol = target.outLines[i].targetNode.col; //сохранить старый цвет следующего узла
-                target.outLines[i].targetNode.inColors.Remove(oldCol); //удалить старый цвет
-                target.outLines[i].targetNode.inColors.Add(target.col); //добавить новый
-                target.outLines[i].col = NormilizeColor(MixColors(target.outLines[i].targetNode.inColors));
-                target.outLines[i].mat.SetColor("_TintColor", target.col);
-                RefreshColors(target.outLines[i].targetNode, prevCol); //уходим в рекурсию
-            }
-            else
-            {
-                Debug.Log("oldCol not found");
-            }
-        }
-    }*/
-
-    /*  protected void StartCIC(Node target, Color newCol, bool flag) //цепное изменение цвета 
-      {                                                             //target - изначально узел, к которому проводится новая линия; при спуске в рекурсию - узел, которому мы меняем цвет
-          Debug.Log("Mixing CIC");
-          if (flag)                                                 //если flag == true, то мы добавляем новый цвет, если false - отнимаем
-              target.inColors.Add(newCol);
-          else
-              target.inColors.Remove(newCol);
-          if (target.inColors.Count != 0)
-          {
-              target.col = NormilizeColor(MixColors(target.inColors, false));
-              target.mat.SetColor("_TintColor", target.col);
-          }
-          else
-          {
-              target.mat.SetColor("_TintColor", target.originColor);
-              target.activate = false;
-
-          }
-          for (int i = 0; i < target.outLines.Count; i++)
-          {
-              if (flag)
-              {
-                  StartCIC(target.outLines[i].targetNode, newCol, flag);
-                  target.outLines[i].mat.SetColor("_TintColor", target.col); //у линии, которая исходит из узла, должен быть новый цвет узла
-              }
-              else
-              {
-                  StartCIC(target.outLines[i].targetNode, target.outLines[i].col, flag);
-                  if (target.inColors.Count == 0)
-                      target.outLines[i].StartDestroy();
-                  else
-                      target.outLines[i].mat.SetColor("_TintColor", target.col);
-              }
-          }
-          target.RefreshOutLines();
-      }*/
-    #endregion
     protected int CheckForLoops(Node origin, Node target) //проверяет, не попадем ли мы в замкнутый круг
     {                                                     //возвращает: 0 - нет кругов, 1 - есть круг, 2 и 3 - ошибка
         if (origin == null)
@@ -354,8 +210,6 @@ public class ShinyFactory : MonoBehaviour
             Debug.Log("no origin");
             return 2;
         }
-        if (target == null)
-            Debug.Log("NULL TARGET 1");
         int depth = 0, maxDepth = 30; //чтобы остановить цикл, если он зайдет слишком далеко
         List<Node> toCheck = new List<Node>();
         toCheck = InsertIntoList(toCheck, target);
@@ -365,15 +219,13 @@ public class ShinyFactory : MonoBehaviour
             //Debug.Log("Checking loops...");
             depth = depth + 1;
             target = toCheck[0];
-            if (target == null)
-                Debug.Log("NULL TARGET 2");
             toCheck.RemoveAt(0);
             if (target != null)
                 toCheck = InsertIntoList(toCheck, target);
         }
         if (depth >= maxDepth)
         {
-            Debug.Log("You are loh in infinity");
+            Debug.Log("You are loh in infinity. You aren't supposed to be a loh, something has gone wrong");
             return 1;
         }
         else if (target == origin)
@@ -388,18 +240,19 @@ public class ShinyFactory : MonoBehaviour
         }
         else if (target == null)
         {
-            Debug.Log("target == null, don't know how, probably no loop");
-            return 0;
+            Debug.Log("target == null. You aren't supposed to see this message, something has gone wrong");
+            return 3;
         }
-        Debug.Log("Hello from CheckForLoops()! You are not supposed to see this message, something has gone wrong");
-        return 3; //сюда по идее не должно доходить
+        Debug.Log("Hello from CheckForLoops()! You aren't supposed to see this message, something has gone wrong");
+        return 3;
     }
+
     private List<Node> InsertIntoList(List<Node> toCheck, Node target) //добавляет для функции CheckForLoops() узлы для проверки, с которыми соединен узел target
     {
         for (int i = 0; i < target.outLines.Count; i++)
         {
             Node toAdd = target.outLines[i].targetNode;
-            if (toAdd == null)
+            if (toAdd == null) //если у нас не было target-узла, значит должен быть answer-узел
             {
                 toAdd = target.outLines[i].answerNode;
             }
