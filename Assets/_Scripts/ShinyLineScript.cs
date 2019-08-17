@@ -14,6 +14,8 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
     public Node parentTargetNode;
+    public TargetNodeScript parentTargetNode;
+    GameObject inNode;
     public int parentNodeIndex;
     int targetNodeIndex;
     ParticleSystem ps;
@@ -69,6 +71,17 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     if (activateAnswer) //если задели узел ответа
                     {   
                         if (answerNode != null && !answerNode.activate)
+
+                    inNode = CheckTargetNode(detectedNodes);
+
+                    if (activateAnswer)
+                    {
+                        if (inNode != null)
+                            answerNode = inNode.GetComponent<AnswerNodeScript>();
+                        else
+                            answerNode = null;
+
+                        if (answerNode != null && !answerNode.activated)
                         {
                             points[1] = answerNode.center;
                             targetNodeIndex = answerNode.index;
@@ -89,8 +102,17 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
+
                         targetNode = CheckTargetNode(detectedNodes); //выбрать оптимальную TargetNode из задетых
                         if (targetNode != null && parentTargetNode != targetNode && CheckForLoops(parentTargetNode, targetNode) == 0) //если выбран узел и он не равен узлу, с которого мы начали, и мы не попадем в петлю
+
+                        if (inNode != null)
+                            targetNode = inNode.GetComponent<TargetNodeScript>();
+                        else
+                            targetNode = null;
+
+                        if (targetNode != null && parentTargetNode != targetNode && !targetNode.initializator)
+
                         {
                             parentTargetNode.outLines.Add(this); //устанавливаем исходящую линию
 
@@ -265,7 +287,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         detectedNodes.Clear();
     }
 
-    private TargetNodeScript CheckTargetNode(List<GameObject> nodes)
+    private GameObject CheckTargetNode(List<GameObject> nodes)
     {
         if (nodes.Count > 0)
         {
@@ -275,7 +297,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                 if (Vector2.Distance(mousePos, nodes[i].transform.position) < 0.6f)
                 {
                     Debug.Log("Yeahh!It's Working!");
-                    return nodes[i].GetComponent<TargetNodeScript>();
+                    return nodes[i];
                 }
 
             }

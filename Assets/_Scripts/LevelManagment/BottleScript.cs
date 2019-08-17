@@ -6,11 +6,14 @@ using Newtonsoft.Json;
 using TMPro;
 public class BottleScript : Managment
 {
+    GameManager gameManager;
+
     public GameObject currentGlowNum;
     public GameObject restrictionLianas1;
     public GameObject restrictionLianas2;
     public RectTransform scrollPane;
     public ParticleSystem ps;
+    public int inLevels = 9;
     TextMeshProUGUI currentGlowNumText;
     float expandScrolling_num;
     int glowNumber = 0;
@@ -22,6 +25,7 @@ public class BottleScript : Managment
     string json;
     private void Awake()
     {
+        gameManager = GameManager.Instance;
         currentGlowNumText = currentGlowNum.GetComponent<TextMeshProUGUI>();
         ps = GetComponentInChildren<ParticleSystem>();
         bottles = new Dictionary<int, BottleConfig>();
@@ -86,6 +90,7 @@ public class BottleScript : Managment
 
     protected void ActivateFullness()
     {
+        gameManager.levelOpened += inLevels;
         restrictionLianas1.SetActive(false);
         restrictionLianas2.SetActive(false);
     }

@@ -45,6 +45,17 @@ namespace MainGame
         'sceneName': 'levelUI'
       }
     ]
+  },
+
+  {
+    'sceneName': 'level_3',
+    'type': 'world',
+    'isActive': true,
+    'requires': [
+      {
+        'sceneName': 'levelUI'
+      }
+    ]
   }
 ]";
 

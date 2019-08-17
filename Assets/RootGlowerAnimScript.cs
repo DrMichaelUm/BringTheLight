@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Controller;
 public class RootGlowerAnimScript : MonoBehaviour
 {
@@ -24,9 +25,16 @@ public class RootGlowerAnimScript : MonoBehaviour
         {
             levelName = gameManager.levelConfigName;
             levelNum = int.Parse((levelName.Substring(levelName.IndexOf("_") + 1))) + 1;
-            levelName = "level_" + levelNum.ToString();
-            app.LoadLevel(levelName);
-            animator.ResetTrigger("EndTheLevel");
+            if (levelNum <= gameManager.levelOpened && (levelNum <= SceneManager.sceneCountInBuildSettings - 3))
+            {
+                levelName = "level_" + levelNum.ToString();
+                app.LoadLevel(levelName);
+                animator.ResetTrigger("EndTheLevel");
+            }
+            else
+            {
+                LoadLevelMenu();
+            }
         }
     }
 
