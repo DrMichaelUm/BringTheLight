@@ -120,6 +120,147 @@ public class ShinyFactory : MonoBehaviour
         color.a = 0.5f;
         return color;
     }            //Приводим цвет к единому стандарту
+    
+    protected void StartCIC(Node target, Color color, bool additive) //цепное изменение цвета для самого первого узла: только здесь цвет _добавляется_ (если additive == true) или _удаляется_ (если additive =- false) (а не замещается) из списка
+    {
+        Color oldCol = target.col;
+        if (additive)
+        {
+            target.inColors.Add(color);
+        }
+        else
+        {
+            if(target.inColors.Contains(color))
+                target.inColors.Remove(color);
+            else
+                Debug.Log("No color in list. You aren't supposed to see this message, something has gone wrong");
+        }
+        if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
+        {
+            target.col = NormilizeColor(MixColors(target.inColors));
+            target.mat.SetColor("_TintColor", target.col);
+        }
+        else //если нет - выключаем узел
+        {
+            target.mat.SetColor("_TintColor", target.originColor);
+            target.activate = false;
+        }
+        CICRefreshColors(target, oldCol); //запускаем обновление цвета в дочерних узлах
+    }
+
+    private void CICRefreshColors(Node parent, Color removedCol) //заменяет цвет removedCol всех линий, исходящих из parent, и узлов, к которым они ведут, на цвет родительского узла (parent)
+    {
+        for (int i = 0; i < parent.outLines.Count; i++) //проходимся по всем исходящим из родителя линиям
+        {
+            bool isAnswer = false; //индикатор того, работаем мы с обычным узлом или узлом ответа
+            Node target = parent.outLines[i].targetNode;
+            if (target == null) //если нет обычного, то будет узел ответа
+            {
+                target = parent.outLines[i].answerNode;
+                isAnswer = true;
+            }
+            Color oldCol = target.col; //сохранить старый цвет
+            if (target.inColors.Contains(removedCol)) //замещаем старый цвет на новый
+            {
+                target.inColors.Remove(removedCol);
+                if (parent.activate) //если родительский узел еще активен, то добавляем его новый цвет. Если нет - просто удаляем
+                    target.inColors.Add(parent.col);
+
+                if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
+                {
+                    target.col = NormilizeColor(MixColors(target.inColors));
+                    if (!isAnswer) //если узел не является узлом ответа, то обновляем его цвет
+                        target.mat.SetColor("_TintColor", target.col);
+                    else //если это узел отета, то делаем проверку
+                        target.GetComponent<AnswerNodeScript>().CheckAnswer();
+                }
+                else //если цветов не осталось - выключаем узел
+                {
+                    target.mat.SetColor("_TintColor", target.originColor);
+                    target.activate = false;
+                    if (isAnswer)
+                    {
+                        target.GetComponent<AnswerNodeScript>().CheckAnswer();
+                        parent.outLines[i].activateAnswer = false;
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("RefreshColors(): doesn't contein remColor. You aren't supposed to see this message, something has gone wrong");
+            }
+            if (parent.activate) //если родительский узел еще активен, то обновляем цвет исходящих линий
+            {
+                parent.outLines[i].col = parent.col; //изменить цвет исходящей линии
+                parent.outLines[i].mat.SetColor("_TintColor", parent.outLines[i].col); //изменить цвет исходящей линии
+            }
+            else //если нет - уничтожаем их
+            {
+                parent.outLines[i].StartDestroy();
+            }
+            CICRefreshColors(target, oldCol); //аналогично меняем цвет в дочерних узлах target
+        }
+        parent.RefreshOutLines(); //обновляем список исходящих линий - некоторых может уже не быть
+    }
+
+    protected int CheckForLoops(Node origin, Node target) //проверяет, не попадем ли мы в замкнутый круг
+    {                                                     //возвращает: 0 - нет кругов, 1 - есть круг, 2 и 3 - ошибка
+        if (origin == null)
+        { 
+            Debug.Log("no origin");
+            return 2;
+        }
+        int depth = 0, maxDepth = 30; //чтобы остановить цикл, если он зайдет слишком далеко
+        List<Node> toCheck = new List<Node>();
+        toCheck = InsertIntoList(toCheck, target);
+        while (depth < maxDepth && toCheck != null && toCheck.Count != 0 && target != null && target.index != origin.index)
+        {
+            //Debug.Log("org: " + origin.index + " targ: " + target.index);
+            //Debug.Log("Checking loops...");
+            depth = depth + 1;
+            target = toCheck[0];
+            toCheck.RemoveAt(0);
+            if (target != null)
+                toCheck = InsertIntoList(toCheck, target);
+        }
+        if (depth >= maxDepth)
+        {
+            Debug.Log("You are loh in infinity. You aren't supposed to be a loh, something has gone wrong");
+            return 1;
+        }
+        else if (target == origin)
+        {
+            Debug.Log("Loop");
+            return 1;
+        }
+        else if (toCheck.Count == 0)
+        {
+            Debug.Log("All checked, no loop");
+            return 0;
+        }
+        else if (target == null)
+        {
+            Debug.Log("target == null. You aren't supposed to see this message, something has gone wrong");
+            return 3;
+        }
+        Debug.Log("Hello from CheckForLoops()! You aren't supposed to see this message, something has gone wrong");
+        return 3;
+    }
+
+    private List<Node> InsertIntoList(List<Node> toCheck, Node target) //добавляет для функции CheckForLoops() узлы для проверки, с которыми соединен узел target
+    {
+        for (int i = 0; i < target.outLines.Count; i++)
+        {
+            Node toAdd = target.outLines[i].targetNode;
+            if (toAdd == null) //если у нас не было target-узла, значит должен быть answer-узел
+            {
+                toAdd = target.outLines[i].answerNode;
+            }
+            toCheck.Add(toAdd);
+        }
+        return toCheck;
+    }
+
 }
 
 //Абстрактный класс узла, наследуем от фабрикм
@@ -134,6 +275,7 @@ public class ShinyFactory : MonoBehaviour
         public GameObject linePrefab;                     //Префаб линии, чтоб создать её, в случае чего
         protected ShinyLineScript activeLine;             //Скрипт линии, которую узел только создал
         public int index;                                 //Индекс узла
+        public bool activate = false;
     protected void OnMouseEnterFunction()                 //Функция, выполняемая при пресесении линии и узла
     {
             inTarget = true;
@@ -170,6 +312,18 @@ public class ShinyFactory : MonoBehaviour
         activeLine.center = center;
         activeLine.startLine = true;
         activeLine.Restart();
+    }
+
+    public void RefreshOutLines()
+    {
+        List<ShinyLineScript> toDelete = new List<ShinyLineScript>();
+        for (int i = 0; i < outLines.Count; i++)
+        {
+            if (!outLines[i].gameObject.activeInHierarchy)
+                toDelete.Add(outLines[i]);
+        }
+        for (int i = 0; i < toDelete.Count; i++)
+            outLines.Remove(toDelete[i]);
     }
 }
     

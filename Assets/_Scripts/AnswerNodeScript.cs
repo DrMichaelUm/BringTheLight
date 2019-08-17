@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class AnswerNodeScript : Node
 {
-    public bool activated = false;
     public bool rightAnswer = false;
     public ParticleSystem rightAnswerEffect;
     ShinyLineScript line;
@@ -53,6 +52,7 @@ public class AnswerNodeScript : Node
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("ShinyLine"))
+            if (!activate)
         {
             line = other.GetComponent<ShinyLineScript>();
             if (!activated && line.startLine)

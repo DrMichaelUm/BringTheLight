@@ -8,12 +8,12 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
     LineRenderer lineRenderer;
     EdgeCollider2D edgeCol;
     Vector3 mousePosition;
-    List<Vector2> points = new List<Vector2>();
     public List<GameObject> detectedNodes = new List<GameObject>();
-    public Vector2 dot1, dot2;
-    public Vector2 endPoint;
+    private Vector2[] points = new Vector2[2]; //[0] - начало линии, [1] - конец
+    
     public TargetNodeScript targetNode;
     public AnswerNodeScript answerNode;
+    public Node parentTargetNode;
     public TargetNodeScript parentTargetNode;
     GameObject inNode;
     public int parentNodeIndex;
@@ -49,26 +49,28 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     private void Update()
     {
-
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0)) //пока мышь нажата, просто прорисовываем линию следом за ней
         {
             if (startLine)
             {
                 mousePosition = Camera.main.ScreenToWorldPoint((new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
 
-                dot1 = center;
-                dot2 = (Vector2)(new Vector3(mousePosition.x, mousePosition.y, 0));
+                points[0] = center;
+                points[1] = (Vector2)(new Vector3(mousePosition.x, mousePosition.y, 0));
 
                 LineBehaviour();
             }
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0)) //если отпустить мышь
         {
-            if (startLine)
+            if (startLine) //если линия была "начата"
             {
-                if (gameManager.inTarget)
+                if (gameManager.inTarget) //если линия попала в какой-то узел
                 {
+                    if (activateAnswer) //если задели узел ответа
+                    {   
+                        if (answerNode != null && !answerNode.activate)
 
                     inNode = CheckTargetNode(detectedNodes);
 
@@ -81,13 +83,14 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
                         if (answerNode != null && !answerNode.activated)
                         {
-                            endPoint = answerNode.center;
+                            points[1] = answerNode.center;
                             targetNodeIndex = answerNode.index;
                             if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
                             {
+                                parentTargetNode.outLines.Add(this); //устанавливаем исходящую линию
                                 answerNode.inColors.Add(col);
                                 answerNode.col = MixColors(answerNode.inColors);
-                                answerNode.activated = true;
+                                answerNode.activate = true;
                                 gameManager.CheckGloworms(1);
                                 answerNode.CheckAnswer();
                             }
@@ -99,27 +102,31 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
+
+                        targetNode = CheckTargetNode(detectedNodes); //выбрать оптимальную TargetNode из задетых
+                        if (targetNode != null && parentTargetNode != targetNode && CheckForLoops(parentTargetNode, targetNode) == 0) //если выбран узел и он не равен узлу, с которого мы начали, и мы не попадем в петлю
+
                         if (inNode != null)
                             targetNode = inNode.GetComponent<TargetNodeScript>();
                         else
                             targetNode = null;
 
                         if (targetNode != null && parentTargetNode != targetNode && !targetNode.initializator)
+
                         {
-                            endPoint = targetNode.center;
+                            parentTargetNode.outLines.Add(this); //устанавливаем исходящую линию
+
+                            points[1] = targetNode.center;
                             targetNodeIndex = targetNode.index;
-                            if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1)
+
+                            if (gameManager.CheckRepeatLine(parentNodeIndex, targetNodeIndex) != 1) //не повторяется ли линия
                             {
-                                if (!targetNode.activate)
+                                if (!targetNode.activate) //если к узлу еще не проводились линии
                                 {
                                     targetNode.activate = true;
                                 }
-                                
-                                targetNode.inColors.Add(col);
-                                targetNode.col = MixColors(targetNode.inColors);
-                                targetNode.col = NormilizeColor(targetNode.col);
+                                StartCIC(targetNode, col, true);
                                 gameManager.CheckGloworms(1);
-                                targetNode.mat.SetColor("_TintColor", targetNode.col);
                             }
                             else
                             {
@@ -138,7 +145,6 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                     }
                     else
                     {
-                        dot2 = endPoint;
                         LineBehaviour();
 
                         this.gameObject.layer = 0;
@@ -146,8 +152,8 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
                         var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
                         gameManager.lines.Add(lineData);
 
-                        if (parentTargetNode != null)
-                            parentTargetNode.numOfLines++;
+                        //if (parentTargetNode != null)
+                            //parentTargetNode.numOfLines++;
                         gameManager.inTarget = false;
                     }
                 }
@@ -186,7 +192,7 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
 
     private void OnMouseDown()
     {
-        if (activateAnswer || (targetNode != null && !targetNode.initializator))
+        if (activateAnswer || (targetNode != null))
         {
             clicked++;
             if (clicked == 1) clicktime = Time.time;
@@ -195,63 +201,47 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
             {
                 clicked = 0;
                 clicktime = 0;
-
-                if (parentTargetNode != null)
-                {
-                    parentTargetNode.numOfLines--;
-                    if (parentTargetNode.numOfLines == 0)
-                        parentTargetNode.initializator = false;
-                }
-
                 if (activateAnswer)
                 {
                     answerNode.inColors.Remove(col);
                     answerNode.col = MixColors(answerNode.inColors);
+                    parentTargetNode.outLines.Remove(this);
                     answerNode.CheckAnswer();
                     activateAnswer = false;
-                    answerNode.activated = false;
+                    answerNode.activate = false;
                 }
                 else
                 {
-                    targetNode.inColors.Remove(col);
-                    targetNode.col = MixColors(targetNode.inColors);
-                    targetNode.col = NormilizeColor(targetNode.col);
-                    if (targetNode.inColors.Count != 0)
-                    {
-                        targetNode.mat.SetColor("_TintColor", targetNode.col);
-                    }
-                    else
-                    {
-                        targetNode.mat.SetColor("_TintColor", targetNode.originColor);
-                        targetNode.activate = false;
-
-                    }
+                    StartCIC(targetNode, col, false);
+                    parentTargetNode.outLines.Remove(this);
+                    parentTargetNode.RefreshOutLines();
                 }
-                var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
-                gameManager.lines.Remove(lineData);
-                gameManager.CheckGloworms(0);
-                DestroyLine();
-
-
+                StartDestroy();
+                /*if (parentTargetNode != null)
+                {
+                    parentTargetNode.numOfLines--;
+                    if (parentTargetNode.numOfLines == 0)
+                        parentTargetNode.initializator = false;
+                }*/
             }
             else if (Time.time - clicktime > 1) clicked = 0;
         }
     }
 
-    private void LineBehaviour()
+    private void LineBehaviour() //отвечает за прорисовку линии следом за мышкой
     {
         //this.transform.position = new Vector2((dot1.x + dot2.x) / 2, (dot1.y + dot2.y) / 2);
-        lineRenderer.SetPosition(0, dot1);
-        lineRenderer.SetPosition(1, dot2);
+        lineRenderer.SetPosition(0, points[0]);
+        lineRenderer.SetPosition(1, points[1]);
 
         #region Настраиваем партикл
-        particleTransform.position = new Vector2((dot1.x + dot2.x) / 2, (dot1.y + dot2.y) / 2);
-        _direction = (dot1 - (Vector2)particleTransform.transform.position).normalized;
+        particleTransform.position = new Vector2((points[0].x + points[1].x) / 2, (points[0].y + points[1].y) / 2);
+        _direction = (points[0] - (Vector2)particleTransform.transform.position).normalized;
         _lookRotation = Quaternion.LookRotation(_direction);
         tempAxis = _lookRotation.x;
         _lookRotation.x = 0f;
         _lookRotation.y = 0f;
-        if (dot1.x < dot2.x)
+        if (points[0].x < points[1].x)
         {
             _lookRotation.z = tempAxis;
         }
@@ -261,26 +251,34 @@ public class ShinyLineScript : Line/*, IPointerDownHandler, IPointerUpHandler*/
         }
         particleTransform.rotation = _lookRotation;
         var psShape = ps.shape;
-        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((dot2.x - dot1.x), 2) + Mathf.Pow((dot2.y - dot1.y), 2)) * 0.9f, 0f, 0f);
+        psShape.scale = new Vector3(Mathf.Sqrt(Mathf.Pow((points[0].x - points[1].x), 2) + Mathf.Pow((points[0].y - points[1].y), 2)) * 0.9f, 0f, 0f);
         #endregion
-        points.Add(dot1);
-        points.Add(dot2);
-        edgeCol.points = points.ToArray();
-        points.Clear();
+        
+        edgeCol.points = points;
     }
+
+
+    public void StartDestroy()
+    {
+        var lineData = new GameManager.LineData(this, parentNodeIndex, targetNodeIndex);
+        gameManager.lines.Remove(lineData);
+        gameManager.CheckGloworms(0);
+        DestroyLine();
+    }
+
 
     void DestroyLine()
     {
-        if (parentTargetNode != null && parentTargetNode.numOfLines <= 0)
+        /*if (parentTargetNode != null && parentTargetNode.numOfLines <= 0)
             parentTargetNode.initializator = false;
-
+            */
         WhenDestroyed();
         gameObject.SetActive(false);
     }
 
     private void WhenDestroyed() //обнуляет переменные
     {
-        points = new List<Vector2>();
+        points = new Vector2[2];
         targetNode = null;
         answerNode = null;
         parentTargetNode = null;
