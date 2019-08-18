@@ -18,7 +18,10 @@ public class RootGlowerAnimScript : MonoBehaviour
         animator = GetComponent<Animator>();
         menuLoading = false;
     }
-
+    public void PlayAnimationOnStart()
+    {
+        gameManager.LevelStartAnimation();
+    }
     public void LoadNextLevel()
     {
         if (!menuLoading)

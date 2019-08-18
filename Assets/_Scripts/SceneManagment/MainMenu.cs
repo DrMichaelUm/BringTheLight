@@ -15,20 +15,20 @@ namespace UI
             app = ApplicationController.app;
         }
 
-        public void Level1()
-        {
-            app.Level1();
-        }
+        //public void Level1()
+        //{
+        //    app.Level1();
+        //}
 
-        public void Level2()
-        {
-            app.Level2();
-        }
+        //public void Level2()
+        //{
+        //    app.Level2();
+        //}
 
-        public void Level3()
-        {
-            app.Level3();
-        }
+        //public void Level3()
+        //{
+        //    app.Level3();
+        //}
 
         public void LoadLevel(string name)
         {

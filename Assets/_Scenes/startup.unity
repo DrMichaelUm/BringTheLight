@@ -7045,6 +7045,7 @@ MonoBehaviour:
   restrictionLianas2: {fileID: 1815914799}
   scrollPane: {fileID: 2018388131}
   ps: {fileID: 0}
+  inLevels: 9
   requiredBound: 5
   bottleNumber: 1
 --- !u!224 &1115446235 stripped
@@ -7604,7 +7605,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1695154956}
     - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -7614,6 +7615,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: level_4
       objectReference: {fileID: 0}
     - target: {fileID: 1940981862850574929, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
@@ -13602,7 +13613,7 @@ MonoBehaviour:
   m_MovementType: 1
   m_Elasticity: 0.2
   m_Inertia: 1
-  m_DecelerationRate: 0.05
+  m_DecelerationRate: 1
   m_ScrollSensitivity: 1
   m_Viewport: {fileID: 0}
   m_HorizontalScrollbar: {fileID: 0}
@@ -14347,6 +14358,21 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1695154956}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LoadLevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: level_1
+      objectReference: {fileID: 0}
     - target: {fileID: 1940981862850574929, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
       propertyPath: pathObj
@@ -14499,7 +14525,7 @@ PrefabInstance:
     - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Level2
+      value: LoadLevel
       objectReference: {fileID: 0}
     - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
@@ -14509,12 +14535,17 @@ PrefabInstance:
     - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: 
+      value: level_2
       objectReference: {fileID: 0}
     - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797681419773750484, guid: 71ea8c5b7bbcda848a94219866a54797,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8224573583767384308, guid: 71ea8c5b7bbcda848a94219866a54797,
         type: 3}
@@ -14648,6 +14679,7 @@ MonoBehaviour:
   restrictionLianas2: {fileID: 1815914799}
   scrollPane: {fileID: 2018388131}
   ps: {fileID: 0}
+  inLevels: 9
   requiredBound: 52
   bottleNumber: 2
 --- !u!1001 &1951401939

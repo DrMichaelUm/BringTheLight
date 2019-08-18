@@ -9633,6 +9633,7 @@ GameObject:
   - component: {fileID: 3446953768724135698}
   - component: {fileID: 6120785587149232768}
   - component: {fileID: 373452923802101628}
+  - component: {fileID: 3622617582444327122}
   m_Layer: 0
   m_Name: AnswerNode
   m_TagString: AnswerNode
@@ -9721,12 +9722,14 @@ MonoBehaviour:
   center: {x: 0, y: 0}
   startLine: 0
   inColors: []
+  outLines: []
   numOfLines: 0
   inTarget: 0
-  targetN: 0
   ps: {fileID: 0}
   linePrefab: {fileID: 0}
-  activated: 0
+  index: 0
+  activate: 0
+  rightAnswer: 0
   rightAnswerEffect: {fileID: 628989716}
 --- !u!58 &373452923802101628
 CircleCollider2D:
@@ -9744,6 +9747,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!95 &3622617582444327122
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2288763486795201202}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d1a793ad6d82415419b8c425e1846e02, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &6441864164646947666
 GameObject:
   m_ObjectHideFlags: 0
@@ -9800,7 +9822,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 1.5
+    scalar: 0
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -14569,8 +14591,8 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 059f2a73527b3de47979678729dd292f, type: 2}
-  - {fileID: 2100000, guid: 059f2a73527b3de47979678729dd292f, type: 2}
+  - {fileID: 2100000, guid: a6fe8045734eb204f8ca28d62d565d4a, type: 2}
+  - {fileID: 2100000, guid: a6fe8045734eb204f8ca28d62d565d4a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

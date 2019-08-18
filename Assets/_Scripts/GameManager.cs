@@ -78,6 +78,15 @@ public class GameManager : Managment
         currentLinesNumText.text = "0 /";
         boundText.text = firstBound.ToString();
     }
+
+    public void LevelStartAnimation()
+    {
+        if (flowers != null)
+            foreach (GameObject flower in flowers)
+            {
+                flower.GetComponent<Animator>().SetTrigger("OpenFlowerAnimation");
+            }
+    }
     public void WinAnimation()
     {
         if (flowers != null && rootGlowerAnimator != null)
@@ -110,11 +119,11 @@ public class GameManager : Managment
         }
     }
 
-    IEnumerator LoadMenuCoroutine()
-    {
-        yield return new WaitForSeconds(4f);
-        app.ToStartup();
-    }
+    //IEnumerator LoadMenuCoroutine()
+    //{
+    //    yield return new WaitForSeconds(4f);
+    //    app.ToStartup();
+    //}
 
     public void CheckGloworms(int flag)
     {

@@ -22,20 +22,20 @@ namespace Controller
            LoadStartup();
         }
 
-        public void Level1()
-        {
-            loader.Load("level_1", () => Helpers.Log("Level 1 loaded"));
-        }
+        //public void Level1()
+        //{
+        //    loader.Load("level_1", () => Helpers.Log("Level 1 loaded"));
+        //}
 
-        public void Level2()
-        {
-            loader.Load("level_2", () => Helpers.Log("Level 2 loaded"));
-        }
+        //public void Level2()
+        //{
+        //    loader.Load("level_2", () => Helpers.Log("Level 2 loaded"));
+        //}
 
-        public void Level3()
-        {
-            loader.Load("level_3", () => Helpers.Log("Level 3 laoded"));
-        }
+        //public void Level3()
+        //{
+        //    loader.Load("level_3", () => Helpers.Log("Level 3 laoded"));
+        //}
 
         public void LoadLevel(string name)
         {

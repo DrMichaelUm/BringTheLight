@@ -7,10 +7,12 @@ public class AnswerNodeScript : Node
     public bool rightAnswer = false;
     public ParticleSystem rightAnswerEffect;
     ShinyLineScript line;
+    Animator animator;
     private void Start()
     {
         index = GameManager.Instance.nodeNumeration;
         GameManager.Instance.nodeNumeration--;
+        animator = GetComponent<Animator>();
         ps = GetComponentInChildren<ParticleSystem>();
         if (ps != null)
             mat = ps.GetComponent<Renderer>().material;
@@ -22,6 +24,7 @@ public class AnswerNodeScript : Node
         var rightEffect = rightAnswerEffect.main;
         rightEffect.startColor = originColor;
         center = new Vector2(transform.position.x, transform.position.y);
+        //animator.SetTrigger("AnsNdFadeIn");
     }
     public void CheckAnswer()
     {
@@ -46,6 +49,7 @@ public class AnswerNodeScript : Node
         {
             GameManager.Instance.win = true;
             GameManager.Instance.WinAnimation();
+            //animator.SetTrigger("AnsNdFadeOut");
         }
     }
 
@@ -55,7 +59,7 @@ public class AnswerNodeScript : Node
             if (!activate)
         {
             line = other.GetComponent<ShinyLineScript>();
-            if (!activated && line.startLine)
+            if (!activate && line.startLine)
             {
                 OnMouseEnterFunction();
                 if (!line.detectedNodes.Contains(gameObject))
