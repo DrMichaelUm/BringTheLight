@@ -39,7 +39,7 @@ namespace Controller
 
         public void LoadLevel(string name)
         {
-            loader.Load(name, () => Helpers.Log(name + " laoded"));
+            loader.Load(name, () => Helpers.Log(name + " loaded"));
         }
         public void ToStartup()
         {

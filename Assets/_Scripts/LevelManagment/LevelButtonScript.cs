@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
-public class LevelButtonScript : Managment
+public class LevelButtonScript : Management
 {
 
     public List<GameObject> gloworms = new List<GameObject>();

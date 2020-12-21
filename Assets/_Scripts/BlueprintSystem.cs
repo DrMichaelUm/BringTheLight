@@ -74,7 +74,7 @@ public class Configs : MonoBehaviour
 }
 
 
-public class Managment : Configs
+public class Management : Configs
 {
     //Функция отключения имейджей светляков. Надо передать список объектов светляков(с УИ) и кол-во которое надо отключить
     public void DisableGloworms(List<GameObject> gloworms, int disableNum)
@@ -112,7 +112,7 @@ public class ShinyFactory : MonoBehaviour
         return resultColor;
     } //Смешиваем цвет
 
-    protected Color NormilizeColor(Color color)
+    protected Color NormalizeColor(Color color)
     {
         Color.RGBToHSV(color, out float H, out float S, out float V);
         S = 0.8f;
@@ -137,7 +137,7 @@ public class ShinyFactory : MonoBehaviour
         }
         if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
         {
-            target.col = NormilizeColor(MixColors(target.inColors));
+            target.col = NormalizeColor(MixColors(target.inColors));
             target.mat.SetColor("_TintColor", target.col);
         }
         else //если нет - выключаем узел
@@ -168,7 +168,7 @@ public class ShinyFactory : MonoBehaviour
 
                 if (target.inColors.Count != 0) //если после этого у нас остались цвета, то смешиваем их
                 {
-                    target.col = NormilizeColor(MixColors(target.inColors));
+                    target.col = NormalizeColor(MixColors(target.inColors));
                     if (!isAnswer) //если узел не является узлом ответа, то обновляем его цвет
                         target.mat.SetColor("_TintColor", target.col);
                     else //если это узел отета, то делаем проверку
@@ -306,7 +306,7 @@ public class ShinyFactory : MonoBehaviour
     {
         GameObject Line = ObjectPoolingManager.Instance.GetShinyLine(parent);
         activeLine = Line.GetComponent<ShinyLineScript>();
-        col = NormilizeColor(col);
+        col = NormalizeColor(col);
         activeLine.col = col;
         Debug.Log("Color is set");
         activeLine.center = center;

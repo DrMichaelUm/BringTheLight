@@ -4,7 +4,7 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using TMPro;
-public class BottleScript : Managment
+public class BottleScript : Management
 {
     GameManager gameManager;
 

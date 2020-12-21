@@ -7,7 +7,7 @@ using TMPro;
 using Newtonsoft.Json;
 using Controller;
 
-public class GameManager : Managment
+public class GameManager : Management
 {
     public static GameManager Instance;
     //Dictionary<string, LevelConfig> levels;
